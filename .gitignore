@@ -1,0 +1,8 @@
+# env tokens
+.env
+
+# database
+database.db
+
+# virtual enviroment
+venv
