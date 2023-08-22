@@ -23,7 +23,7 @@ class DatabaseManager:
             who_user INTEGER NOT NULL,
             title TEXT,
             desc TEXT,
-            img_url TEXT,
+            file_id TEXT,
             task_date TEXT
         )
         ''')
@@ -61,11 +61,11 @@ class DatabaseManager:
         spam_base = self.cursor.fetchall()
         return spam_base
 
-    def add_task(self, who_user, title, desc, img_url):
+    def add_task(self, who_user, title, desc, file_id):
         task_date = utils.get_now_date()
         try:
-            self.cursor.execute('INSERT INTO tasks (who_user, title, desc, task_date, img_url) VALUES (?,?,?,?,?);',
-                                (who_user, title, desc, task_date, img_url))
+            self.cursor.execute('INSERT INTO tasks (who_user, title, desc, task_date, file_id) VALUES (?,?,?,?,?);',
+                                (who_user, title, desc, task_date, file_id))
             self.conn.commit()
             return True
         except Exception as ex:
@@ -93,17 +93,18 @@ class DatabaseManager:
 
     def update_task_date(self, who_user, new_date, task_id):
         try:
-            self.cursor.execute('UPDATE tasks SET date=? WHERE who_user=? AND id=?;',
+            self.cursor.execute('UPDATE tasks SET task_date=? WHERE who_user=? AND id=?;',
                                 (new_date, who_user, task_id))
             self.conn.commit()
+            return True
         except Exception as ex:
             print(ex)
             return False
 
-    def update_task_url(self, who_user, new_url, task_id):
+    def update_task_url(self, who_user, new_file_id, task_id):
         try:
-            self.cursor.execute('UPDATE tasks SET img_url=? WHERE who_user=? AND id=?;',
-                                (new_url, who_user, task_id))
+            self.cursor.execute('UPDATE tasks SET file_id=? WHERE who_user=? AND id=?;',
+                                (new_file_id, who_user, task_id))
             self.conn.commit()
         except Exception as ex:
             print(ex)

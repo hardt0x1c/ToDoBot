@@ -1,6 +1,7 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from loader import db
+from utils import utils
 
 
 def show_tasks(tasks, index_page):
@@ -101,6 +102,36 @@ def task_edit_menu(task, index_page):
     back = InlineKeyboardButton(text='◀️ Назад',
                                 callback_data=f'return_task_{task}_{index_page}')
     menu.add(edit_title, edit_desc, edit_date, edit_url, back)
+    menu.adjust(1)
+    menu = menu.as_markup()
+    return menu
+
+
+def task_edit_date_menu(task, index_page):
+    menu = InlineKeyboardBuilder()
+    dates = utils.get_week_dates()
+    for i in dates:
+        menu.add(InlineKeyboardButton(text=i, callback_data=f'change_date_{task}_{index_page}_{i}'))
+    menu.adjust(1)
+    menu = menu.as_markup()
+    return menu
+
+
+def back_to_edit(task, index_page):
+    menu = InlineKeyboardBuilder()
+    back = InlineKeyboardButton(text='◀️ Назад',
+                                callback_data=f'return_task_{task}_{index_page}')
+    menu.add(back)
+    menu.adjust(1)
+    menu = menu.as_markup()
+    return menu
+
+
+def back_to_task(task, index_page):
+    menu = InlineKeyboardBuilder()
+    back = InlineKeyboardButton(text='◀️ Назад',
+                                callback_data=f'show_task_number_{task[0]}_{index_page}')
+    menu.add(back)
     menu.adjust(1)
     menu = menu.as_markup()
     return menu

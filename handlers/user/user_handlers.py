@@ -3,7 +3,6 @@ import keyboards.user.user_keyboard as user_kb
 import keyboards.user.show_tasks_pagination as user_kb_pag
 from States.user import User
 from aiogram import types
-from aiogram.types import FSInputFile
 from aiogram import F
 from aiogram.filters.command import Command
 from aiogram.fsm.context import FSMContext
@@ -19,7 +18,7 @@ async def start_command(message: types.Message):
 @dp.message(Command('add_task'))
 @dp.message(F.text == 'Добавить задачу')
 async def add_task(message: types.Message, state: FSMContext):
-    await message.answer(user_msg.add_task_title)
+    await message.answer(user_msg.add_task_title, reply_markup=user_kb.back_button)
     await state.set_state(User.add_task_title)
 
 
@@ -34,7 +33,7 @@ async def add_task_title(message: types.Message, state: FSMContext):
 @dp.message(User.add_task_desc)
 async def add_task_desc(message: types.Message, state: FSMContext):
     await state.update_data(task_desc=message.text)
-    await message.answer('Отправьте ссылку на фотографию к задаче, если не нужно отправьте 0')
+    await message.answer('Отправьте боту фотографию, если не нужна введите "0"')
     await state.set_state(User.add_task_url)
 
 
@@ -43,9 +42,9 @@ async def add_task_url(message: types.Message, state: FSMContext):
     data = await state.get_data()
     task_title = data['task_title']
     task_desc = data['task_desc']
-    task_url = message.text if message.text != '0' else ''
+    file_id = message.photo[-1].file_id if message.text != '0' else ''
 
-    if db.add_task(who_user=message.from_user.id, title=task_title, desc=task_desc, img_url=task_url):
+    if db.add_task(who_user=message.from_user.id, title=task_title, desc=task_desc, file_id=file_id):
         await message.answer(user_msg.add_task_success)
         await state.clear()
     else:
@@ -82,7 +81,14 @@ async def delete_task(message: types.Message, state: FSMContext):
 
 @dp.message(Command('delete_tasks'))
 async def delete_tasks(message: types.Message):
-    await message.answer('Вы уверенны, что хотите удалить все задачи?')
+    await message.answer('Вы уверены, что хотите удалить все задачи?')
+
+
+@dp.callback_query(F.data == 'back_button')
+async def back(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.delete()
+    await state.clear()
+    await callback.message.answer('Действие отменено!')
 
 
 @dp.callback_query(F.data == 'asdasdasd')
